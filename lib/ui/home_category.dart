@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:podcast_app/core/services/podcast_services.dart';
+import 'package:podcast_app/ui/podcast_details.dart';
 import 'package:podcast_search/podcast_search.dart';
 
 class HomeCategory extends StatelessWidget {
@@ -24,7 +25,6 @@ class HomeCategory extends StatelessWidget {
             )
           ],
         ),
-
         FutureBuilder<SearchResult>(
           future: PodcastServices().fetchPodcast(genre: genre),
           builder:
@@ -39,15 +39,32 @@ class HomeCategory extends StatelessWidget {
                     final items = snapshot.data?.items;
                     final item = items?[index];
 
-                    return Image.network(
-                      item?.artworkUrl600 ?? '',
-                      fit: BoxFit.cover,
+                    return GestureDetector(
+                      onTap: () {
+                        if(item == null) return;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PodcastDetailsScreen(item: item),
+                          ),
+                        );
+                      },
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                        item?.artworkUrl600 ?? '',
+                        // height: 450,
+                        width: 160,
+                        fit: BoxFit.cover,
+                      ),
+                      )
                     );
-                  }, separatorBuilder: (BuildContext context, int index) { 
-                    return SizedBox(
+                  },
+                  separatorBuilder: (BuildContext context, int index) {
+                    return const SizedBox(
                       width: 10,
                     );
-                   },
+                  },
                 ),
               );
             }

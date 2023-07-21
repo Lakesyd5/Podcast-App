@@ -46,6 +46,8 @@
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<key>NSMicrophoneUsageDescription</key>
+    <string>Podcast app needs microphone to play Podcast</string>
 	<true/>
 </dict>
 </plist>

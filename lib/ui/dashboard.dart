@@ -23,7 +23,7 @@ class Dashboard extends StatelessWidget {
                   style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
                 ),
                 Text('What do you want to listen to today?'),
-                SizedBox(height: 25),
+                SizedBox(height: 20),
               ],
             ),
 
