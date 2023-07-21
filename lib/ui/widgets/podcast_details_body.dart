@@ -74,11 +74,6 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                       'By: ${widget.item.artistName}',
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    // Row(
-                    //   children: [
-
-                    //   Text( ?? '', style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),overflow: TextOverflow.ellipsis,)
-                    // ],)
                   ],
                 ),
               )
@@ -156,11 +151,11 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                           onPressed: () {
                             if (episode.contentUrl == null) return;
                             setState(() {
-                              currentEpisodeIndex == index;
+                              currentEpisodeIndex = index;
                             });
                             if (currentEpisodeIndex == index && _player.playing) {
                               _player.pause();
-                              currentEpisodeIndex == -1;
+                              currentEpisodeIndex = -1;
                               return;
                             }
                             _player.setUrl(episode.contentUrl!);
