@@ -1,37 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:html/parser.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:just_audio_background/just_audio_background.dart';
+import 'package:podcast_app/ui/providers/audio_player_provider.dart';
 import 'package:podcast_search/podcast_search.dart';
 import 'package:readmore/readmore.dart';
 import 'package:intl/intl.dart';
 
-class PodcastDetails extends StatefulWidget {
+class PodcastDetails extends ConsumerStatefulWidget {
   const PodcastDetails({super.key, required this.item, required this.podcast});
 
   final Item item;
   final Podcast podcast;
 
   @override
-  State<PodcastDetails> createState() => _PodcastDetailsState();
+  ConsumerState<PodcastDetails> createState() => _PodcastDetailsState();
 }
 
-class _PodcastDetailsState extends State<PodcastDetails> {
-  late AudioPlayer _player;
+class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
   int currentEpisodeIndex = -1;
 
   @override
   void initState() {
     super.initState();
-    _player = AudioPlayer();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _player.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final audioPlayer = ref.read(audioPlayerProvider);
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
@@ -82,7 +84,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
           const SizedBox(height: 15),
           // Text(widget.podcast.description ?? '')
           ReadMoreText(
-            widget.podcast.description ?? '',
+            parseHtml(widget.podcast.description ?? ''),
             colorClickableText: Colors.green,
             trimLines: 4,
             trimMode: TrimMode.Line,
@@ -141,7 +143,7 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                             fontSize: 16, fontWeight: FontWeight.w400),
                       ),
                       subtitle: Text(
-                        episode.description,
+                        parseHtml(episode.description),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -153,13 +155,26 @@ class _PodcastDetailsState extends State<PodcastDetails> {
                             setState(() {
                               currentEpisodeIndex = index;
                             });
-                            if (currentEpisodeIndex == index && _player.playing) {
-                              _player.pause();
+                            if (currentEpisodeIndex == index &&
+                                audioPlayer.playing) {
+                              audioPlayer.pause();
                               currentEpisodeIndex = -1;
                               return;
                             }
-                            _player.setUrl(episode.contentUrl!);
-                            _player.play();
+                            audioPlayer.setUrl(episode.contentUrl!);
+                            final audioSource = AudioSource.uri(
+                              Uri.parse(episode.contentUrl ?? ''),
+                              tag: MediaItem(
+                                // Specify a unique ID for each media item:
+                                id: Key(episode.guid).toString(),
+                                // Metadata to display in the notification:
+                                album: widget.podcast.title,
+                                title: episode.title,
+                                artUri: Uri.parse(widget.podcast.image ?? ''),
+                              ),
+                            );
+                            audioPlayer.setAudioSource(audioSource);
+                            audioPlayer.play();
                           },
                           icon: currentEpisodeIndex == index
                               ? const Icon(Icons.pause)
@@ -190,4 +205,10 @@ class _PodcastDetailsState extends State<PodcastDetails> {
       ),
     );
   }
+}
+
+String parseHtml(String htmlString) {
+  final document = parse(htmlString);
+  final String parsedString = parse(document.body!.text).documentElement!.text;
+  return parsedString;
 }
