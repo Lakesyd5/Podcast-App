@@ -35,7 +35,7 @@ class Dashboard extends StatelessWidget {
                     children: [
                       HomeCategory(title: 'Trending Today', genre: 'Places'),
                       SizedBox(height: 10),
-                      HomeCategory(title: 'Tech Podacast', genre: 'Technology'),
+                      HomeCategory(title: 'Tech Podcast', genre: 'Technology'),
                       SizedBox(height: 10),
                       HomeCategory(title: 'Sports Today', genre: 'Sports'),
                       SizedBox(height: 10),

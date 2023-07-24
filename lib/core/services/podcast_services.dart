@@ -1,4 +1,7 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:podcast_search/podcast_search.dart';
+
+final podcastServiceProvider = Provider((ref) => PodcastServices());
 
 class PodcastServices {
   Future<SearchResult> fetchPodcast({String genre = ''}) async {
@@ -11,4 +14,4 @@ class PodcastServices {
     final podcast = await Podcast.loadFeed(url: feedUrl);
     return podcast;
   }
-}
+} 
