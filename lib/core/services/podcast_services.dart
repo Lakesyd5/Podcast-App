@@ -10,6 +10,12 @@ class PodcastServices {
     return results;
   }
 
+  Future<SearchResult> fetchAllPodcast({String genre = ''}) async {
+    final search = Search();
+    final results = await search.charts(country: Country.nigeria, genre: genre);
+    return results;
+  }
+
   Future<Podcast> getPodcast(String feedUrl) async {
     final podcast = await Podcast.loadFeed(url: feedUrl);
     return podcast;

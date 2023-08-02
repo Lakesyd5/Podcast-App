@@ -11,14 +11,15 @@ class SeeAll extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final seeallPodcast = ref.watch(podcastCategoryProvider(genre));
+    final seeallPodcast = ref.watch(podcastAllProvider(genre));
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 29, 29, 29),
       appBar: AppBar(
         title: Text(title),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        backgroundColor: Colors.transparent,
         elevation: 0,
       ),
+      extendBodyBehindAppBar: true,
       body: seeallPodcast.when(
         data: (SearchResult data) {
           return Padding(
@@ -59,7 +60,7 @@ class SeeAll extends ConsumerWidget {
         },
         error: (error, stackTrace) {
           return const Center(
-            child: Text('Opps! Somethign went wrong.'),
+            child: Text('Opps! Something went wrong.'),
           );
         },
         loading: () {

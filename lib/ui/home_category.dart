@@ -20,7 +20,7 @@ class HomeCategory extends ConsumerWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w500),
+              style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 17, fontWeight: FontWeight.w500),
             ),
             TextButton(
               onPressed: () {
@@ -53,11 +53,14 @@ class HomeCategory extends ConsumerWidget {
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          item.artworkUrl600 ?? '',
-                          // height: 450,
-                          width: 160,
-                          fit: BoxFit.cover,
+                        child: Hero(
+                          tag: 'image-art${item.artworkUrl600}',
+                          child: Image.network(
+                            item.artworkUrl600 ?? '',
+                            // height: 450,
+                            width: 160,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ));
                 },

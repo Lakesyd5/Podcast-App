@@ -23,16 +23,6 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
   int currentEpisodeIndex = -1;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final audioPlayer = ref.read(audioPlayerProvider);
     return Padding(
@@ -42,8 +32,8 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
           Row(
             children: [
               SizedBox(
-                height: 150,
-                width: 150,
+                height: 170,
+                width: 170,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
@@ -68,14 +58,17 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
                     Text(
                       widget.item.trackName ?? '',
                       style: const TextStyle(
-                          fontSize: 19, fontWeight: FontWeight.bold),
+                          fontSize: 19,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                     ),
                     const SizedBox(height: 6),
                     Text(
                       'By: ${widget.item.artistName}',
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white),
                     ),
                   ],
                 ),
@@ -95,13 +88,20 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
                 TextStyle(color: Colors.red[400], fontWeight: FontWeight.w500),
             lessStyle:
                 TextStyle(color: Colors.red[400], fontWeight: FontWeight.w500),
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.5),
+              fontSize: 14.5,
+            ),
           ),
           const SizedBox(height: 8),
           const SizedBox(
             width: double.infinity,
             child: Text(
               'All Episodes',
-              style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white),
             ),
           ),
           const SizedBox(height: 15),
@@ -117,72 +117,89 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
                   child: Column(
                     children: [
                       ListTile(
-                        titleAlignment: ListTileTitleAlignment.top,
+                        // titleAlignment: ListTileTitleAlignment.top,
                         contentPadding: EdgeInsets.zero,
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
-                          child: Image.network(
-                            episode.imageUrl ??
-                                widget.podcast.image ??
-                                'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg',
-                            loadingBuilder: (BuildContext context, Widget child,
-                                ImageChunkEvent? loadingProgress) {
-                              if (loadingProgress == null) {
-                                return child;
-                              }
-                              return const Center(
-                                child: CircularProgressIndicator(),
-                              );
-                            },
-                            width: 60,
-                            height: 60,
-                            fit: BoxFit.cover,
+                          child: Hero(
+                            tag: 'image-art-${episode.imageUrl}',
+                            child: Image.network(
+                                episode.imageUrl ??
+                                    widget.podcast.image ??
+                                    'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg',
+                                loadingBuilder: (BuildContext context,
+                                    Widget child,
+                                    ImageChunkEvent? loadingProgress) {
+                                  if (loadingProgress == null) {
+                                    return child;
+                                  }
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                },
+                                width: 70,
+                                height: 70,
+                                fit: BoxFit.cover,
+                              ),
                           ),
                         ),
                         title: Text(
                           episode.title,
-                          maxLines: 2,
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w400),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white),
                         ),
                         subtitle: Text(
                           parseHtml(episode.description),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontSize: 13, fontWeight: FontWeight.w400),
+                          style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w400,
+                              color: Colors.white.withOpacity(0.6)),
                         ),
-                        trailing: IconButton(
-                            onPressed: () {
-                              if (episode.contentUrl == null) return;
-                              setState(() {
-                                currentEpisodeIndex = index;
-                              });
-                              if (currentEpisodeIndex == index &&
-                                  audioPlayer.playing) {
-                                audioPlayer.pause();
-                                currentEpisodeIndex = -1;
-                                return;
-                              }
-                              audioPlayer.setUrl(episode.contentUrl!);
-                              final audioSource = AudioSource.uri(
-                                Uri.parse(episode.contentUrl ?? ''),
-                                tag: MediaItem(
-                                  // Specify a unique ID for each media item:
-                                  id: Key(episode.guid).toString(),
-                                  // Metadata to display in the notification:
-                                  album: widget.podcast.title,
-                                  title: episode.title,
-                                  artUri: Uri.parse(widget.podcast.image ?? ''),
-                                ),
-                              );
-                              audioPlayer.setAudioSource(audioSource);
-                              audioPlayer.play();
-                            },
-                            icon: currentEpisodeIndex == index
-                                ? const Icon(Icons.pause)
-                                : const Icon(Icons.play_arrow_rounded)),
+                        trailing: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                              shape: const CircleBorder(),
+                              backgroundColor: Colors.green,
+                              padding: const EdgeInsets.all(5)),
+                          onPressed: () {
+                            if (episode.contentUrl == null) return;
+                            setState(() {
+                              currentEpisodeIndex = index;
+                            });
+                            if (currentEpisodeIndex == index &&
+                                audioPlayer.playing) {
+                              audioPlayer.pause();
+                              currentEpisodeIndex = -1;
+                              return;
+                            }
+                            audioPlayer.setUrl(episode.contentUrl!);
+                            final audioSource = AudioSource.uri(
+                              Uri.parse(episode.contentUrl ?? ''),
+                              tag: MediaItem(
+                                // Specify a unique ID for each media item:
+                                id: Key(episode.guid).toString(),
+                                // Metadata to display in the notification:
+                                album: widget.podcast.title,
+                                title: episode.title,
+                                artUri: Uri.parse(widget.podcast.image ?? ''),
+                              ),
+                            );
+                            audioPlayer.setAudioSource(audioSource);
+                            audioPlayer.play();
+                          },
+                          child: Icon(
+                            currentEpisodeIndex == index
+                                ? Icons.pause
+                                : Icons.play_arrow_rounded,
+                            size: 28,
+                            color: const Color.fromARGB(255, 29, 29, 29),
+                          ),
+                        ),
                       ),
                       Row(
                         children: [
@@ -190,7 +207,9 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
                             DateFormat.yMMMMd().format(
                                 episode.publicationDate ?? DateTime.now()),
                             style: const TextStyle(
-                                fontSize: 14, fontWeight: FontWeight.w500),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white),
                           )
                         ],
                       )
@@ -201,7 +220,7 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
               separatorBuilder: (context, index) {
                 return const Divider(
                   thickness: 0.5,
-                  color: Colors.black45,
+                  color: Colors.grey,
                 );
               },
             ),

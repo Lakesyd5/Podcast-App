@@ -6,28 +6,28 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const  Scaffold(
-      // backgroundColor: Colors.black54,
+    return  Scaffold(
+      backgroundColor: const Color.fromARGB(225, 29, 29, 29),
       body:  SafeArea(
           child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(height: 20),
-                Text(
+                const SizedBox(height: 20),
+                const Text(
                   'Welcome',
-                  style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontSize: 35, fontWeight: FontWeight.bold),
                 ),
-                Text('What do you want to listen to today?'),
-                SizedBox(height: 20),
+                Text('What do you want to listen to today?', style: TextStyle(color: Colors.grey.shade600, fontSize: 15),),
+                const SizedBox(height: 20),
               ],
             ),
 
-            Expanded(
+            const Expanded(
               child: SizedBox(
                 child: SingleChildScrollView(
                   scrollDirection: Axis.vertical,

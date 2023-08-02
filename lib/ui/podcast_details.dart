@@ -14,14 +14,15 @@ class PodcastDetailsScreen extends ConsumerWidget {
     // final podcastService = ref.read(podcastServiceProvider);
     return Scaffold(
       appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.black),
-        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.white.withOpacity(0.6)),
+        backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
           item.trackName ?? '',
-          style: const TextStyle(color: Colors.black),
+          style: const TextStyle(color: Colors.grey),
         ),
       ),
+      backgroundColor: const Color.fromARGB(255, 29, 29, 29),
       body: FutureBuilder<Podcast>(
         future: PodcastServices().getPodcast(item.feedUrl ?? ''),
         builder: (BuildContext context, AsyncSnapshot<Podcast> snapshot) {
