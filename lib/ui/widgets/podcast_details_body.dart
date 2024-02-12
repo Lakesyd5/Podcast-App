@@ -28,6 +28,7 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
@@ -164,7 +165,7 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
                         trailing: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                               shape: const CircleBorder(),
-                              backgroundColor: Colors.green,
+                              backgroundColor: Colors.purple[900],
                               padding: const EdgeInsets.all(5)),
                           onPressed: () {
                             if (episode.contentUrl == null) return;

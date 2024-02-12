@@ -13,7 +13,7 @@ class SeeAll extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final seeallPodcast = ref.watch(podcastAllProvider(genre));
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 29, 29, 29),
+      backgroundColor: const Color.fromARGB(255, 29, 29, 29),
       appBar: AppBar(
         title: Text(title),
         backgroundColor: Colors.transparent,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:podcast_app/core/common/widgets/home_category_shimmer.dart';
 import 'package:podcast_app/ui/podcast_details.dart';
 import 'package:podcast_app/ui/providers/podcast_provider.dart';
 import 'package:podcast_app/ui/see_all_category.dart';
@@ -79,7 +80,7 @@ class HomeCategory extends ConsumerWidget {
           },
           loading: () {
             return const Center(
-              child: CircularProgressIndicator(),
+              child: HomeCategoryShimmer(),
             );
           },
         )
