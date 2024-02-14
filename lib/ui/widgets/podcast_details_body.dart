@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:html/parser.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
+import 'package:podcast_app/core/services/audio_player_services.dart';
 import 'package:podcast_app/episode_details.dart';
 import 'package:podcast_app/ui/providers/audio_player_provider.dart';
 import 'package:podcast_search/podcast_search.dart';
@@ -24,7 +25,7 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
 
   @override
   Widget build(BuildContext context) {
-    final audioPlayer = ref.read(audioPlayerProvider);
+    final audioPlayer = ref.read(audioPlayerServiceProvider).audioPlayer;
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Column(
@@ -119,11 +120,12 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
                     children: [
                       ListTile(
                         // titleAlignment: ListTileTitleAlignment.top,
+                        titleAlignment: ListTileTitleAlignment.center,
                         contentPadding: EdgeInsets.zero,
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Hero(
-                            tag: 'image-art-${episode.imageUrl}',
+                            tag: 'image-art-${episode.duration}',
                             child: Image.network(
                                 episode.imageUrl ??
                                     widget.podcast.image ??
@@ -134,9 +136,7 @@ class _PodcastDetailsState extends ConsumerState<PodcastDetails> {
                                   if (loadingProgress == null) {
                                     return child;
                                   }
-                                  return const Center(
-                                    child: CircularProgressIndicator(),
-                                  );
+                                  return const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2.0));
                                 },
                                 width: 70,
                                 height: 70,

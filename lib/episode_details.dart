@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:just_audio_background/just_audio_background.dart';
-import 'package:podcast_app/ui/providers/audio_player_provider.dart';
+import 'package:podcast_app/core/services/audio_player_services.dart';
 import 'package:podcast_app/ui/widgets/podcast_details_body.dart';
 import 'package:podcast_search/podcast_search.dart';
 import 'package:readmore/readmore.dart';
 
-// TODO - Fix all issues relating to the play/pause & the stream for the progress indicator
+// TODO - Fix all issues relating to the stream for the progress indicator
+// & also when the podcast stops the icon should return to play
 
 class EpisodeDetails extends ConsumerStatefulWidget {
   const EpisodeDetails({super.key, required this.episode});
@@ -20,51 +19,16 @@ class EpisodeDetails extends ConsumerStatefulWidget {
 }
 
 class _EpisodeDetailsState extends ConsumerState<EpisodeDetails> {
-  double progress = 0.0;
-
-  @override
-  void initState() {
-    super.initState();
-    initializePlayer();
-  }
-
-  void initializePlayer() async {
-    final audioPlayer = ref.read(audioPlayerProvider);
-    audioPlayer.positionStream.listen((position) {
-      final currentPosition = position.inMilliseconds.toDouble();
-      final totalDuration =
-          audioPlayer.bufferedPosition.inMilliseconds.toDouble();
-
-      SchedulerBinding.instance.addPostFrameCallback(
-        (_) {
-          setState(() {
-            if (totalDuration > 0 &&
-                currentPosition.isFinite &&
-                totalDuration.isFinite) {
-              progress = currentPosition;
-            }
-          });
-        },
-      );
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    ref.read(audioPlayerProvider).dispose();
-  }
+  String? currentUrl;
 
   @override
   Widget build(BuildContext context) {
-    final _episode = widget.episode;
-    final audioPlayer = ref.read(audioPlayerProvider);
+    final episode = widget.episode;
+    final audioPlayerService = ref.read(audioPlayerServiceProvider);
+    final audioPlayer = audioPlayerService.audioPlayer;
     Duration? duration = widget.episode.duration;
     String formattedDuration = durationFormat(duration);
-    // bool isPlaying = audioPlayer.playing;
-    Icon playPauseIcon = audioPlayer.playing
-        ? Icon(Icons.pause_rounded, size: 50, color: Colors.purple[900])
-        : Icon(Icons.play_arrow_rounded, size: 50, color: Colors.purple[900]);
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white.withOpacity(0.6)),
@@ -80,7 +44,7 @@ class _EpisodeDetailsState extends ConsumerState<EpisodeDetails> {
               height: 400,
               width: double.infinity,
               child: Hero(
-                tag: 'image-art-${_episode.imageUrl}',
+                tag: 'image-art-${episode.duration}',
                 child: Image.network(
                   widget.episode.imageUrl ??
                       'https://icon-library.com/images/found-icon/found-icon-20.jpg',
@@ -126,7 +90,7 @@ class _EpisodeDetailsState extends ConsumerState<EpisodeDetails> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       LinearProgressIndicator(
-                        value: progress,
+                        value: ref.watch(audioPlayerServiceProvider).progress,
                         minHeight: 3,
                         borderRadius: BorderRadius.circular(10.0),
                       ),
@@ -134,7 +98,9 @@ class _EpisodeDetailsState extends ConsumerState<EpisodeDetails> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              audioPlayer.seekToPrevious();
+                            },
                             icon: Icon(
                               Icons.skip_previous_rounded,
                               size: 50,
@@ -143,30 +109,39 @@ class _EpisodeDetailsState extends ConsumerState<EpisodeDetails> {
                           ),
                           IconButton(
                             onPressed: () {
-                              if (widget.episode.contentUrl == null) return;
-                              if (audioPlayer.playing) {
-                                audioPlayer.pause();
+                              if (audioPlayerService.audioPlayer.playing) {
+                                audioPlayerService.pause();
+                              } else {
+                                audioPlayerService.play(widget.episode);
                               }
-                              audioPlayer.setUrl(widget.episode.contentUrl!);
-                              final audioSource = AudioSource.uri(
-                                Uri.parse(widget.episode.contentUrl ?? ''),
-                                tag: MediaItem(
-                                  // Specify a unique ID for each media item:
-                                  id: Key(widget.episode.guid).toString(),
-                                  // Metadata to display in the notification:
-                                  album: widget.episode.title,
-                                  title: widget.episode.title,
-                                  artUri: Uri.parse(widget.episode.imageUrl ??
-                                      'https://icon-library.com/images/found-icon/found-icon-20.jpg'),
-                                ),
-                              );
-                              audioPlayer.setAudioSource(audioSource);
-                              audioPlayer.play();
                             },
-                            icon: playPauseIcon,
+                            icon: StreamBuilder(
+                              stream: audioPlayer.playerStateStream,
+                              builder: (context, snapshot) {
+                                final playerState = snapshot.data;
+                                final processingState =
+                                    playerState?.processingState;
+                                final playing = playerState?.playing;
+
+                                if (processingState ==
+                                        ProcessingState.loading ||
+                                    processingState ==
+                                        ProcessingState.buffering) {
+                                  return const CircularProgressIndicator();
+                                } else {
+                                  return playing != true
+                                      ? Icon(Icons.play_arrow_rounded,
+                                          size: 50, color: Colors.purple[900])
+                                      : Icon(Icons.pause_rounded,
+                                          size: 50, color: Colors.purple[900]);
+                                }
+                              },
+                            ),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              audioPlayer.seekToNext();
+                            },
                             icon: Icon(
                               Icons.skip_next_rounded,
                               size: 50,
